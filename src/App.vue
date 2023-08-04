@@ -1,5 +1,18 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
+import { createClient } from '@supabase/supabase-js'
+import { Database } from './types'
 import HelloWorld from './components/HelloWorld.vue'
+
+const supabase = createClient<Database>(
+  import.meta.env.VITE_SUPABASE_URL, 
+  import.meta.env.VITE_SUPABASE_KEY
+)
+
+onMounted(async () => {
+  const { data } = await supabase.from("movies").select()
+  console.log("result:", data)
+})
 </script>
 
 <template>
