@@ -1,25 +1,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { supabaseClient } from "./supabase";
+import { getSupabaseRoom } from "./supabase";
 
 const messages = ref<string[]>([]);
 
-const chatRoom = supabaseClient.channel("chat-room", {
-  config: {
-    broadcast: {
-      self: true,
-    },
-  },
+const supabaseRoom = getSupabaseRoom();
+
+supabaseRoom.on("broadcast", { event: "chat" }, (payload) => {
+  messages.value.push(payload.message);
 });
 
-chatRoom
-  .on("broadcast", { event: "chat" }, (payload) => {
-    messages.value.push(payload.message);
-  })
-  .subscribe();
-
 function sendMessage() {
-  chatRoom.send({
+  supabaseRoom.send({
     type: "broadcast",
     event: "chat",
     message: new Date().toISOString(),
